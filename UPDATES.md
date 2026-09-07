@@ -4,8 +4,9 @@ Changes to VierrataleAI since the previous releases.
 
 The project is shipped as two mirrored packages — the **Node CLI**
 (`@vierratale/ai` on npm) and the **Python CLI** (`vierrataleai` on PyPI) —
-and every feature below is implemented identically in both mirrors. The Node
-and Python version numbers are listed together for each release.
+and every feature below is implemented identically in both mirrors. Every
+published version is listed here, newest first; the Node and Python version
+numbers are listed together for each release.
 
 ## `0.1.0-beta.15` (npm) / `0.1.0b15` (PyPI)
 
@@ -42,17 +43,6 @@ and Python version numbers are listed together for each release.
   (`python -m vierrataleai.vcpu.vgpu` / `node vcpu/vgpu.js`).
 - `vcpu bench [--cores N]` runs the whole suite — vCPU plan, VRAM bandwidth +
   latency, and VGPU matmul — in one shot, pinned to the chosen cores.
-
-## `0.1.0-beta.13` (npm) / `0.1.0b13` (PyPI)
-
-### Installer & launchers
-- Installer rewritten to install only requirements — the runtime (Node.js or
-  Python), the local AI engine (Cortex) and the model — then link the command
-  into the first writable on-PATH bin dir, without re-installing the app from
-  npm/PyPI (this repo is the app).
-- Both `vierrataleai` and `vierratale` launchers ship for each runtime (Node
-  symlink / Python shim with `PYTHONPATH`).
-- READMEs and docs updated to match; first full publish pass of both mirrors.
 
 ## `0.1.0-beta.14` (npm) / `0.1.0b14` (PyPI)
 
@@ -114,6 +104,17 @@ and Python version numbers are listed together for each release.
     tool docs teach the same, and anything that still sounds like
     JavaScript/Python dependency management (npm, pip, "node modules", …)
     stays out of the system manager's way.
+
+## `0.1.0-beta.13` (npm) / `0.1.0b13` (PyPI)
+
+### Installer & launchers
+- Installer rewritten to install only requirements — the runtime (Node.js or
+  Python), the local AI engine (Cortex) and the model — then link the command
+  into the first writable on-PATH bin dir, without re-installing the app from
+  npm/PyPI (this repo is the app).
+- Both `vierrataleai` and `vierratale` launchers ship for each runtime (Node
+  symlink / Python shim with `PYTHONPATH`).
+- READMEs and docs updated to match; first full publish pass of both mirrors.
 
 ## `0.1.0-beta.12` (npm) / `0.1.0b11` (PyPI)
 
@@ -178,3 +179,35 @@ and Python version numbers are listed together for each release.
   mirror — same plan parsing, tool execution, and session handling.
 - Input-history recording fixed on both mirrors; the full Node and Python
   test suites (153 tests each at the time) pass.
+
+## `0.1.0-fixfetch-beta9.5` (npm) / `0.1.0b8.dev5` (PyPI)
+
+### Web fetch hardening
+- Patch release between the beta.9/b8 and beta.10/b9 full releases: hardened
+  `/fetch` and the model's web tooling so failed or mis-labelled fetches
+  return clean, usable results instead of errors. The full WebFetch
+  feature set landed in the following beta.11/b10 release.
+
+## `0.1.0-beta.1` – `0.1.0-beta.9` (npm) / `0.1.0b1` – `0.1.0b8` (PyPI)
+
+### Early development series
+The first releases established the core assistant. Detailed per-version notes
+for these early betas were not recorded; the following is a cumulative summary
+of what this series delivered:
+- Terminal chat assistant that runs AI models locally (Cortex engine) and in
+  the cloud (OpenAI / Anthropic / Gemini) with automatic provider detection
+  and `vierratale-*` model names.
+- Slash-command set: `/help`, `/model`, `/provider`, `/models`, `/system`,
+  `/search`, `/fetch`, `/log`, `/clear`, `/new`, `/quit`.
+- Smart web search — questions (who/what/when/where/why/how) and bare topic
+  mentions trigger a live search with AI-summarized answers; `/search <query>`
+  forces one explicitly.
+- Story-mode replies saved to a `<subject>.txt` file; generic `tell me a
+  story` replies are also saved to a `.txt` file.
+- File writing: `FILE:`/`FOLDER:` blocks, automatic filename inference,
+  nested-folder creation, and safe overwrite handling.
+- Full-screen chat UI with language-tagged code boxes, automatic per-day
+  logging under `~/.config/vierrataleai/logs/`, and conversation memory
+  restored on the next launch.
+- Continuous provider-specific fixes (local-engine substitution, cloud model
+  routing) shipped across the series.
