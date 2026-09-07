@@ -1,6 +1,6 @@
 class Branding:
     APP_NAME = "VierrataleAI"
-    VERSION = "0.1.0b14"
+    VERSION = "0.1.0b15"
     USER_PROMPT = "You"
     AI_PROMPT = "AI"
 

@@ -3,7 +3,7 @@
 # VierrataleAI Installer
 # ----------------------
 # Sets up the requirements for running VierrataleAI from this workspace:
-#   - the local AI engine (Cortex, "secretly" Ollama under the hood)
+#   - the local AI engine (Cortex)
 #   - the model
 #   - the runtime (Node.js or Python) and curl
 #   - the "vierrataleai" / "vierratale" commands on your PATH
@@ -16,7 +16,7 @@
 #   ./install.sh --node         Use the Node.js version
 #   ./install.sh --python       Use the Python version
 #   ./install.sh --no-engine    Skip Engine / model installation
-#   ./install.sh --model NAME   Model to pull (default: vierratale-fast)
+#   ./install.sh --model NAME   Model to pull (default: VTL-2.7-Flash)
 #   ./install.sh --silent       Everything with defaults, no prompts
 #   ./install.sh --uninstall    Remove the commands + config
 #   ./install.sh --help         Show this help
@@ -37,7 +37,7 @@ RESET='\033[0m'
 
 VERSION="1.0.0"
 INSTALLER_NAME="VierrataleAI Installer"
-DEFAULT_MODEL="vierratale-fast"
+DEFAULT_MODEL="VTL-2.7-Flash"
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 CONFIG_DIR="$XDG_CONFIG_HOME/vierrataleai"
 CONFIG_FILE="$CONFIG_DIR/config.json"
@@ -300,7 +300,7 @@ install_engine() {
     info "Installing Cortex Engine..."
     run_spinner "Installing Cortex Engine" bash -c 'curl -fsSL https://ollama.com/install.sh | sh'
     if ! is_engine_installed; then
-      warn "Cortex Engine install failed. Install later: curl -fsSL https://ollama.com/install.sh | sh"
+      warn "Cortex Engine install failed. Run the installer again to retry."
     else
       ok "Cortex Engine installed."
     fi
@@ -321,6 +321,18 @@ pull_model() {
   local model="$1" real
   # Real model names must match the app catalog (catalog.js / vierrataleai/catalog.py).
   case "$model" in
+    VTL-2.5-Mini)      real="qwen3:0.6b" ;;
+    VTL-2.7-Flash)     real="gemma3:1b" ;;
+    VTL-2.9-Core)      real="llama3.2:1b" ;;
+    VTL-3.2-Orbit)     real="llama3.2:3b" ;;
+    VTL-3.1-Plus)      real="qwen2.5:1.5b" ;;
+    VTL-3.3-Pro)       real="qwen2.5-coder:1.5b" ;;
+    VTL-3.5-Reason)    real="qwen3:1.7b" ;;
+    VTL-3.7-Ultra)     real="qwen2.5:3b" ;;
+    VTL-4.7-Gusto)     real="gemma3:4b" ;;
+    VTL-5.4-Tempo)     real="phi4-mini" ;;
+    VTL-5.2-Pinnacle)  real="glm4:9b" ;;
+    VTL-5.9-Sovereign) real="qwen3:4b" ;;
     vierratale-lite)     real="qwen3:0.6b" ;;
     vierratale-fast)     real="gemma3:1b" ;;
     vierratale-small)    real="llama3.2:1b" ;;
@@ -330,19 +342,19 @@ pull_model() {
     *)                   real="$model" ;;
   esac
   is_engine_installed || { warn "Engine binary not found; re-run this installer after installing it."; return 1; }
-  info "Pulling model '$model' ($real) — first download can take a while..."
+  info "Pulling model '$model' — first download can take a while..."
   if [ "$SILENT" = "1" ]; then
     if ollama pull "$real" >> "$INSTALL_LOG" 2>&1; then
       ok "Model '$model' is ready."
     else
-      warn "Could not pull '$real'. Run later: ollama pull $real"
+      warn "Could not pull '$model'. Run the installer again to retry."
       return 1
     fi
   else
     if ollama pull "$real"; then
       ok "Model '$model' is ready."
     else
-      warn "Could not pull '$real'. Run later: ollama pull $real"
+      warn "Could not pull '$model'. Run the installer again to retry."
       return 1
     fi
   fi

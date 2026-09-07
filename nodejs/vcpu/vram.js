@@ -3,11 +3,12 @@
 //
 // Carves a pseudo-VRAM memory pool out of RAM (standing in for GPU HBM when no
 // GPU exists) and reduces it across N worker threads (virtual cores), reporting
-// achieved memory bandwidth.
+// achieved memory bandwidth and per-read latency.
 //
 // Usage:
 //   node vram.js                 # 256 MB pool, 6 workers
 //   node vram.js 512 6           # 512 MB pool across 6 workers
+//   node vram.js --pool 512 --workers 6 --latency
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { readFileSync } from 'node:fs';
 
@@ -36,14 +37,38 @@ function vcpuSet(n = DEFAULT_WORKERS) {
   return ordered.slice(0, n).sort((a, b) => a - b);
 }
 
+function readLatency(bytes, samples = 20000) {
+  const n = bytes.length;
+  let idx = 0;
+  const t0 = process.hrtime.bigint();
+  for (let s = 0; s < samples; s++) {
+    void bytes[idx];
+    idx = (idx + 65537) % n;
+  }
+  const ns = Number(process.hrtime.bigint() - t0) / samples;
+  return ns;
+}
+
 if (isMainThread) {
   const args = process.argv.slice(2);
-  const poolMb = args[0] && /^\d+$/.test(args[0]) ? parseInt(args[0], 10) : DEFAULT_POOL_MB;
-  const workers = args[1] && /^\d+$/.test(args[1]) ? parseInt(args[1], 10) : DEFAULT_WORKERS;
+  let poolMb = DEFAULT_POOL_MB;
+  let workers = DEFAULT_WORKERS;
+  let doLatency = false;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--pool' && args[i + 1] && /^\d+$/.test(args[i + 1])) { poolMb = parseInt(args[i + 1], 10); i++; }
+    else if (a === '--workers' && args[i + 1] && /^\d+$/.test(args[i + 1])) { workers = parseInt(args[i + 1], 10); i++; }
+    else if (a === '--latency') doLatency = true;
+    else if (/^\d+$/.test(a) && i === 0) poolMb = parseInt(a, 10);
+  }
 
   const total = poolMb * 1024 * 1024 / 4; // float32 count
   const per = Math.floor(total / workers);
   const cpus = vcpuSet(workers);
+  const pool = new Float32Array(total);
+  for (let i = 0; i < total; i += 1024) {
+    pool.fill((i % 7) * 0.5, i, Math.min(i + 1024, total));
+  }
   console.log(`[JS VRAM] pool=${poolMb}MB workers=${workers} vCPUs=${cpus.join(',')}`);
 
   const t0 = Date.now();
@@ -65,7 +90,9 @@ if (isMainThread) {
   Promise.all(jobs).then(() => {
     const secs = (Date.now() - t0) / 1000;
     const gbps = total * 4 / 1e9 / secs;
-    console.log(`[JS VRAM] reduced in ${secs.toFixed(3)}s  throughput=${gbps.toFixed(2)} GB/s  checksum=${checksum.toFixed(1)}`);
+    let line = `[JS VRAM] reduced in ${secs.toFixed(3)}s  throughput=${gbps.toFixed(2)} GB/s  checksum=${checksum.toFixed(1)}`;
+    if (doLatency) line += `  latency=${readLatency(pool).toFixed(1)} ns/read`;
+    console.log(line);
   });
 } else {
   const { lo, hi } = workerData;

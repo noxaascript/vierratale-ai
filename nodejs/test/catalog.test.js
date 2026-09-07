@@ -4,15 +4,16 @@ import { Catalog } from '../src/catalog.js';
 
 test('catalog: real <-> display mapping', () => {
   assert.equal(Catalog.getRealModel('VRTL-2.fast'), 'gemma3:1b');
-  assert.equal(Catalog.getDisplayName('gemma3:1b'), 'VRTL-2.fast');
+  assert.equal(Catalog.getDisplayName('gemma3:1b'), 'VTL-2.7-Flash');
+  assert.equal(Catalog.getDisplayName('qwen2.5-coder:1.5b'), 'VTL-3.3-Pro');
   assert.equal(Catalog.getRealModel('gpt-4o-mini'), 'gpt-4o-mini');
 });
 
 test('catalog: legacy vierratale-* names still map', () => {
   assert.equal(Catalog.getRealModel('vierratale-fast'), 'gemma3:1b');
   assert.equal(Catalog.getRealModel('vierratale-cloud-mini'), 'gpt-4o-mini');
-  assert.equal(Catalog.normalize('vierratale-pro'), 'VRTL-6.pro');
-  assert.equal(Catalog.normalize('VRTL-6.pro'), 'VRTL-6.pro');
+  assert.equal(Catalog.normalize('vierratale-pro'), 'VTL-3.7-Ultra');
+  assert.equal(Catalog.normalize('VRTL-6.pro'), 'VTL-3.7-Ultra');
   assert.equal(Catalog.normalize('nonsense'), 'nonsense');
 });
 
@@ -47,7 +48,7 @@ test('catalog: getModelInfo present for all listed models', () => {
 
 test('catalog: coder tier VRTL-4.coder maps to the installed coder model', () => {
   assert.equal(Catalog.getRealModel('VRTL-4.coder'), 'qwen2.5-coder:1.5b');
-  assert.equal(Catalog.getDisplayName('qwen2.5-coder:1.5b'), 'VRTL-4.coder');
+  assert.equal(Catalog.getDisplayName('qwen2.5-coder:1.5b'), 'VTL-3.3-Pro');
   assert.equal(Catalog.isLocalModel('VRTL-4.coder'), true);
   const info = Catalog.getModelInfo('VRTL-4.coder');
   assert.equal(info.realModel, 'qwen2.5-coder:1.5b');

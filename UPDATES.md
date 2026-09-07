@@ -7,6 +7,53 @@ The project is shipped as two mirrored packages — the **Node CLI**
 and every feature below is implemented identically in both mirrors. The Node
 and Python version numbers are listed together for each release.
 
+## `0.1.0-beta.15` (npm) / `0.1.0b15` (PyPI)
+
+### Rebrand: VTL model catalog (no vendor names shown)
+- The whole catalog was renamed to the **VTL** scheme. Users only ever see
+  opaque VTL display names — the underlying engine tags (qwen, gemma, llama,
+  glm, kimi, gpt-4o, claude, gemini, …) and the word "Ollama" are hidden from
+  every user-facing surface (CLI, `/models`, errors, help, installer, README).
+- Catalog now has **21 models — 12 local + 9 cloud**:
+  - Local: VTL-2.5-Mini, VTL-2.7-Flash, VTL-2.9-Core, VTL-3.2-Orbit,
+    VTL-3.1-Plus, VTL-3.3-Pro, VTL-3.5-Reason, VTL-3.7-Ultra, VTL-4.7-Gusto,
+    VTL-5.4-Tempo, VTL-5.2-Pinnacle, VTL-5.9-Sovereign.
+  - Cloud: VTL-4.0, VTL-4.2-Omni, VTL-4.5-Plus, VTL-5.0-Pro, VTL-6.0-Reason,
+    VTL-7.0-Omnij, VTL-8.0-Fabric, VTL-9.0-Forge, VTL-10.0-Singularity.
+  - Newly added: GLM-powered VTL-5.2-Pinnacle, Kimi-powered VTL-8.0-Fabric,
+    VTL-9.0-Forge and VTL-10.0-Singularity, plus lightweight options
+    VTL-3.2-Orbit, VTL-4.7-Gusto, VTL-5.4-Tempo and VTL-5.9-Sovereign.
+- Legacy `vierratale-*` and old `VRTL-*` names still work (config files keep
+  resolving) and normalize to the new VTL names. The default model is now
+  `VTL-2.7-Flash` in both mirrors; `install.sh --model` accepts VTL names.
+- `/models`, self-intent messages, error guidance and CLI help now show only
+  VTL display names; the raw engine tag listing is replaced with an
+  "additional engine models available" count.
+
+### Virtual CPU / VRAM / VGPU benchmark suite
+- `vcpu` now takes a configurable core count:
+  `... vcpu plan|self|engine|server|bench --cores N` (or
+  `VIERRATALE_VCPU_CORES`); the engine-server mode runs foreground
+  (`vcpu server --cores N`), pinned to the set.
+- `vram` gained flags (`--pool MB --threads N --latency`) and reports
+  per-read latency (ns) alongside throughput.
+- **New `vgpu`** module in both mirrors: a float32 matmul kernel fanned out
+  over the vCPU threads, reporting GFLOPS / TOPS and effective bandwidth
+  (`python -m vierrataleai.vcpu.vgpu` / `node vcpu/vgpu.js`).
+- `vcpu bench [--cores N]` runs the whole suite — vCPU plan, VRAM bandwidth +
+  latency, and VGPU matmul — in one shot, pinned to the chosen cores.
+
+## `0.1.0-beta.13` (npm) / `0.1.0b13` (PyPI)
+
+### Installer & launchers
+- Installer rewritten to install only requirements — the runtime (Node.js or
+  Python), the local AI engine (Cortex) and the model — then link the command
+  into the first writable on-PATH bin dir, without re-installing the app from
+  npm/PyPI (this repo is the app).
+- Both `vierrataleai` and `vierratale` launchers ship for each runtime (Node
+  symlink / Python shim with `PYTHONPATH`).
+- READMEs and docs updated to match; first full publish pass of both mirrors.
+
 ## `0.1.0-beta.14` (npm) / `0.1.0b14` (PyPI)
 
 ### Installer
@@ -15,7 +62,7 @@ and Python version numbers are listed together for each release.
   `NodeJS or Python? [N/P]` (flags: `--node`, `--python`, `--no-engine`,
   `--model NAME`, `--silent`, `--uninstall`, `--help`).
 - It installs only requirements — the runtime, curl, the local AI engine
-  (Cortex, "secretly" Ollama), and the model — then links the
+  (Cortex), and the model — then links the
   `vierrataleai`/`vierratale` commands into the first writable on-PATH bin
   dir. It does **not** re-install the app from npm or PyPI; this repo is the
   app.
@@ -29,9 +76,9 @@ and Python version numbers are listed together for each release.
 - The npm (`@vierratale/ai`) and PyPI (`vierrataleai`) packages keep both
   `vierrataleai` and `vierratale` bins but no longer ship an `install.sh` —
   that lives only in the project repo.
-- `install.sh` started the engine with the current banner, `ollama pull` tier→
-  model mapping matching the app catalog (`vierratale-fast` → `gemma3:1b`,
-  `vierratale-lite` → `qwen3:0.6b`, …), Termux-safe pip bootstrap (no
+- `install.sh` started the engine with the current banner, an engine-pull tier→
+  model mapping matching the app catalog (`vierratale-fast`,
+  `vierratale-lite`, …), Termux-safe pip bootstrap (no
   `python3-pip` package), picks the Python that has `rich`, and flags a missing
   `curl` up front.
 

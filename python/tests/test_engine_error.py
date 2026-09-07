@@ -67,7 +67,7 @@ class EngineErrorTest(unittest.TestCase):
         self.assertTrue(msg.startswith("[ERR-0002]"), msg)
         self.assertIn("not installed", msg)
         self.assertIn("gpt-4o-mini", msg)
-        self.assertIn("VRTL-6.pro", msg)
+        self.assertIn("VTL-3.7-Ultra", msg)
         self.assertFalse(msg.startswith("http://"), "must not leak the engine URL")
         self.assertNotIn(str(self.port), msg)
 

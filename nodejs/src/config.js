@@ -12,7 +12,7 @@ function configPaths() {
 
 const DEFAULTS = {
   provider: 'auto',
-  model: 'VRTL-2.fast',
+  model: 'VTL-2.7-Flash',
   engineHost: 'http://127.0.0.1:11434',
   numCtx: 2048,
   temperature: 0.7,

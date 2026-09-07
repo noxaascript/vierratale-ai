@@ -25,9 +25,9 @@ try {
     execSync('curl -fsSL https://ollama.com/install.sh | sh', { stdio: 'inherit' });
   } else {
     console.log(
-      '\n[vierrataleai] The local engine (ollama) was not detected.\n' +
+      '\n[vierrataleai] The local engine was not detected.\n' +
         '  - Run the CLI: it will attempt to install and start the engine automatically.\n' +
-        '  - Or install it yourself: curl -fsSL https://ollama.com/install.sh | sh\n'
+        '  - Or run ./install.sh (in the project repo) to set up the engine.\n'
     );
   }
 } catch {

@@ -94,10 +94,10 @@ class CortexProvider(BaseProvider):
             if err.code == 404 or "not found" in err_body.lower():
                 raise RuntimeError(
                     f'[ERR-0002] Model "{model}" is not installed on the engine. '
-                    "If you picked a cloud model, use /model VRTL-6.pro or /provider openai."
+                    "If you picked a cloud model, use /model VTL-3.7-Ultra or /provider openai."
                 )
             raise RuntimeError(
-                f"[ERR-0003] The engine returned HTTP {err.code}. Check the engine status or run /model VRTL-2.fast."
+                f"[ERR-0003] The engine returned HTTP {err.code}. Check the engine status or run /model VTL-2.7-Flash."
             )
         except Exception as err:
             raise RuntimeError(
@@ -157,10 +157,10 @@ class CortexProvider(BaseProvider):
             if err.code == 404 or "not found" in err_body.lower():
                 raise RuntimeError(
                     f'[ERR-0002] Model "{model}" is not installed on the engine. '
-                    "If you picked a cloud model, use /model VRTL-6.pro or /provider openai."
+                    "If you picked a cloud model, use /model VTL-3.7-Ultra or /provider openai."
                 )
             raise RuntimeError(
-                f"[ERR-0003] The engine returned HTTP {err.code}. Check the engine status or run /model VRTL-2.fast."
+                f"[ERR-0003] The engine returned HTTP {err.code}. Check the engine status or run /model VTL-2.7-Flash."
             )
         except Exception as err:
             raise RuntimeError(

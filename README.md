@@ -3,9 +3,9 @@
 Intelligent terminal assistant that runs AI models locally and in the cloud.
 
 VierrataleAI is a chat assistant that works right in your terminal. It runs
-local models through the **Cortex** engine (Ollama under the hood) and can
-switch to cloud models (OpenAI, Anthropic, Gemini). It searches the web, writes
-files, and remembers your conversations — all from the command line.
+local models through the **Cortex** engine and can switch to cloud models
+(OpenAI, Anthropic, Gemini). It searches the web, writes files, and remembers
+your conversations — all from the command line.
 
 ## Quick start
 
@@ -18,7 +18,7 @@ vierratale               # start chatting
 ```
 
 `./install.sh` installs only **requirements** — the runtime (Node.js or
-Python), the local AI engine (Cortex/Ollama), and the model — then links the
+Python), the local AI engine (Cortex), and the model — then links the
 `vierrataleai` and `vierratale` commands on your PATH. It does **not**
 re-install the app from npm or PyPI; this repo is the app.
 
@@ -32,7 +32,7 @@ it automatically before opening the chat.
 ./install.sh                # interactive (asks "NodeJS or Python? [N/P]")
 ./install.sh --node         # use the Node.js version
 ./install.sh --python       # use the Python version
-./install.sh --model NAME   # pick the local model (default: vierratale-lite)
+./install.sh --model NAME   # pick the local model (default: VTL-2.7-Flash)
 ./install.sh --no-engine    # skip engine / model installation
 ./install.sh --silent       # all defaults, no prompts
 ./install.sh --uninstall    # remove the commands + config
@@ -57,7 +57,7 @@ vierrataleai --provider cortex        # Use local models
 vierrataleai --provider openai        # Use cloud models (OpenAI)
 vierrataleai --provider anthropic     # Use cloud models (Claude)
 vierrataleai --provider gemini        # Use cloud models (Gemini)
-vierrataleai --model VRTL-6.pro       # Use a specific model
+vierrataleai --model VTL-3.7-Ultra    # Use a specific model
 ```
 
 `vierratale` and `vierrataleai` are the same command.
@@ -66,28 +66,37 @@ vierrataleai --model VRTL-6.pro       # Use a specific model
 
 Local models run through the **Cortex** engine:
 
-| Model | Backend |
-|-------|---------|
-| VRTL-1.lite | qwen3:0.6b |
-| VRTL-2.fast | gemma3:1b |
-| VRTL-3.small | llama3.2:1b |
-| VRTL-4.balanced | qwen2.5:1.5b |
-| VRTL-5.plus | qwen3:1.7b |
-| VRTL-6.pro | qwen2.5:3b |
+| Model | Tier |
+|-------|------|
+| VTL-2.5-Mini | minimal |
+| VTL-2.7-Flash | fast |
+| VTL-2.9-Core | small |
+| VTL-3.2-Orbit | small |
+| VTL-3.1-Plus | balanced |
+| VTL-3.3-Pro | coder |
+| VTL-3.5-Reason | reasoning |
+| VTL-3.7-Ultra | ultra |
+| VTL-4.7-Gusto | balanced |
+| VTL-5.4-Tempo | balanced |
+| VTL-5.2-Pinnacle | pro |
+| VTL-5.9-Sovereign | pro |
 
 Cloud models are available when the matching provider + API key is configured:
 
-| Model | Backend |
-|-------|---------|
-| VRTL-7.cloud-mini | gpt-4o-mini (OpenAI) |
-| VRTL-8.cloud | gpt-4o (OpenAI) |
-| VRTL-9.cloud-fast | claude-3-5-haiku-20241022 (Anthropic) |
-| VRTL-10.cloud-pro | claude-sonnet-4-20250514 (Anthropic) |
-| VRTL-11.cloud-lite | gemini-2.0-flash (Gemini) |
-| VRTL-12.cloud-plus | gemini-1.5-pro (Gemini) |
+| Model | Tier |
+|-------|------|
+| VTL-4.0 | cloud-mini |
+| VTL-4.2-Omni | cloud |
+| VTL-4.5-Plus | cloud-fast |
+| VTL-5.0-Pro | cloud-pro |
+| VTL-6.0-Reason | cloud-lite |
+| VTL-7.0-Omnij | cloud-plus |
+| VTL-8.0-Fabric | cloud-fabric |
+| VTL-9.0-Forge | cloud-forge |
+| VTL-10.0-Singularity | cloud-singularity |
 
-Legacy `vierratale-*` names (e.g. `vierratale-fast`) still work and map to the
-VRTL names.
+Legacy `vierratale-*` and old `VRTL-*` names (e.g. `vierratale-fast`) still
+work and map to the VTL names.
 
 ## Commands
 

@@ -86,7 +86,7 @@ Usage: vierrataleai [options]
 
 Options:
   --provider, -p <name>   Provider: cortex, openai (default: auto-detect)
-  --model, -m <name>      Model: VRTL-1.lite/2.fast/4.balanced/6.pro/8.cloud
+  --model, -m <name>      Model: e.g. VTL-2.7-Flash/3.5-Reason/6.0-Reason
   --clear                 (deprecated: screen is always cleared on start)
   --install, --setup      Install engine + model + a 'vierrataleai' command, then run
   --version, -v           Show version
@@ -1033,14 +1033,14 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
                     else:
                         chat_ui.notify(f"{m}{current} - {info['tier']}")
                 if provider.is_local:
-                    extras = sorted(
+                    extras = [
                         m
                         for m in installed
                         if not catalog.get_model_info(m)
                         and m != config.get_effective_model(provider.name)
-                    )
-                    for m in extras:
-                        chat_ui.notify(f"  {m} ✓ (raw engine model)")
+                    ]
+                    if extras:
+                        chat_ui.notify(f"  (+{len(extras)} additional engine models available)")
                 chat_ui.render(messages)
                 continue
 
@@ -1060,7 +1060,7 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
                     if provider.is_local and catalog.is_cloud_model(canonical):
                         chat_ui.notify(
                             f"Cannot use cloud model \"{canonical}\" on {provider.display_name} (local). "
-                            f"Use /model VRTL-6.pro or /provider openai."
+                            f"Use /model VTL-3.7-Ultra or /provider openai."
                         )
                     elif not info:
                         if provider.is_local:
@@ -1185,11 +1185,9 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
             intent = detect_intent(user_input)
             if intent == "self":
                 model = config.get_effective_model(provider.name)
-                info = catalog.get_model_info(model)
-                real = f" ({info['real_model']})" if info else ""
                 chat_ui.clear_notices()
                 chat_ui.notify(
-                    f"I'm running on {model}{real} via the {provider.display_name} engine."
+                    f"I'm running on {model} via the {provider.display_name} engine."
                 )
                 chat_ui.render(messages)
                 continue

@@ -14,7 +14,7 @@ def _config_file() -> Path:
 
 DEFAULTS = {
     "provider": "auto",
-    "model": "VRTL-2.fast",
+    "model": "VTL-2.7-Flash",
     "engine_host": "http://127.0.0.1:11434",
     "num_ctx": 2048,
     "temperature": 0.7,

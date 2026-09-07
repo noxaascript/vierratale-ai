@@ -43,7 +43,7 @@ test('cortex provider: 404 model-not-found gives actionable guidance', async () 
   assert.ok(error, 'expected an error to be thrown');
   assert.match(error.message, /^\[ERR-0002\]/);
   assert.match(error.message, /not installed/);
-  assert.match(error.message, /VRTL-6\.pro/);
+  assert.match(error.message, /VTL-3\.7-Ultra/);
   assert.ok(!error.message.includes('127.0.0.1'), 'error must not leak the engine URL');
   assert.ok(!error.message.includes(String(port)), 'error must not leak the engine port');
 

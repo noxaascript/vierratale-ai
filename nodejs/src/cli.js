@@ -41,7 +41,7 @@ Usage: vierrataleai [options]
 
 Options:
   --provider, -p <name>   Provider: cortex, openai (default: auto-detect)
-  --model, -m <name>      Model: VRTL-1.lite/2.fast/4.balanced/6.pro/8.cloud
+  --model, -m <name>      Model: e.g. VTL-2.7-Flash/3.5-Reason/6.0-Reason
   --clear                 (deprecated: screen is always cleared on start)
   --install, --setup      Install engine + model + a "vierrataleai" command, then run
   --version, -v           Show version
@@ -830,8 +830,8 @@ async function chat(provider, systemPrompt) {
         const extras = [...installedSet].filter(
           (m) => !Catalog.getModelInfo(m) && m !== Config.getEffectiveModel(provider.name)
         );
-        for (const m of extras) {
-          chatUI.notify(`  ${m} ✓ (raw engine model)`);
+        if (extras.length) {
+          chatUI.notify(`  (+${extras.length} additional engine models available)`);
         }
       }
       chatUI.render(messages);
@@ -850,7 +850,7 @@ async function chat(provider, systemPrompt) {
           chatUI.setModel(model, provider.displayName);
         };
         if (provider.isLocal && Catalog.isCloudModel(canonical)) {
-          chatUI.notify(`Cannot use cloud model "${canonical}" on ${provider.displayName} (local). Use /model VRTL-6.pro or /provider openai.`);
+          chatUI.notify(`Cannot use cloud model "${canonical}" on ${provider.displayName} (local). Use /model VTL-3.7-Ultra or /provider openai.`);
         } else if (!info) {
           if (provider.isLocal) {
             const switched = await ensureRawLocalModel(modelName, (m) => chatUI.notify(m));
@@ -993,7 +993,7 @@ async function chat(provider, systemPrompt) {
       const info = Catalog.getModelInfo(model);
       chatUI.clearNotices();
       chatUI.notify(
-        `I'm running on ${model} (${info ? info.realModel : model}) via the ${provider.displayName} engine.`
+        `I'm running on ${model} via the ${provider.displayName} engine.`
       );
       chatUI.render(messages);
       continue;

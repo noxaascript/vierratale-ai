@@ -8,13 +8,13 @@ from vierrataleai import catalog
 class CatalogTest(unittest.TestCase):
     def test_mapping(self):
         self.assertEqual(catalog.get_real_model("VRTL-2.fast"), "gemma3:1b")
-        self.assertEqual(catalog.get_display_name("gemma3:1b"), "VRTL-2.fast")
+        self.assertEqual(catalog.get_display_name("gemma3:1b"), "VTL-2.7-Flash")
 
     def test_legacy_vierratale_names_still_map(self):
         self.assertEqual(catalog.get_real_model("vierratale-fast"), "gemma3:1b")
         self.assertEqual(catalog.get_real_model("vierratale-cloud-mini"), "gpt-4o-mini")
-        self.assertEqual(catalog.normalize("vierratale-pro"), "VRTL-6.pro")
-        self.assertEqual(catalog.normalize("VRTL-6.pro"), "VRTL-6.pro")
+        self.assertEqual(catalog.normalize("vierratale-pro"), "VTL-3.7-Ultra")
+        self.assertEqual(catalog.normalize("VRTL-6.pro"), "VTL-3.7-Ultra")
         self.assertEqual(catalog.normalize("nonsense"), "nonsense")
 
     def test_local_vs_cloud(self):
@@ -36,7 +36,7 @@ class CatalogTest(unittest.TestCase):
 
     def test_coder_tier_maps_to_installed_coder_model(self):
         self.assertEqual(catalog.get_real_model("VRTL-4.coder"), "qwen2.5-coder:1.5b")
-        self.assertEqual(catalog.get_display_name("qwen2.5-coder:1.5b"), "VRTL-4.coder")
+        self.assertEqual(catalog.get_display_name("qwen2.5-coder:1.5b"), "VTL-3.3-Pro")
         self.assertTrue(catalog.is_local_model("VRTL-4.coder"))
         info = catalog.get_model_info("VRTL-4.coder")
         self.assertEqual(info["real_model"], "qwen2.5-coder:1.5b")
