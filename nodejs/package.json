@@ -1,0 +1,31 @@
+{
+  "name": "@vierratale/ai",
+  "version": "0.1.0-beta.14",
+  "description": "VierrataleAI - Intelligent terminal assistant",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "vierrataleai": "./bin/vierrataleai.js",
+    "vierratale": "./bin/vierrataleai.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "ai",
+    "chatbot",
+    "terminal",
+    "assistant",
+    "llm"
+  ]
+}

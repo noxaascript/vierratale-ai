@@ -9,11 +9,9 @@
 // Installation progress is always the fake animated bar — real engine/model
 // output is deliberately hidden so first-run feels quick and clean.
 import { run } from '../src/cli.js';
-import { Installer } from '../src/installer.js';
+import { Engine } from '../src/engine.js';
 import { Config } from '../src/config.js';
 import { Branding } from '../src/ui/branding.js';
-import { Terminal } from '../src/ui/terminal.js';
-import { dirname } from 'path';
 
 const C = Branding.colors;
 
@@ -63,19 +61,11 @@ async function main() {
 
   if (doInstall) {
     console.log(`\n  ${C.bold}${C.primary}${Branding.APP_NAME} ${Branding.VERSION}${C.reset} ${C.dim}— installer${C.reset}\n`);
-    const result = await fakeProgress(INSTALL_STEPS, Installer.install());
-    if (!result.command) {
-      Terminal.printInfo('Could not create a global command; run it via the bin script.');
-    } else {
-      Terminal.printSuccess(`Engine + model installed; "vierrataleai" (or "vierratale") command available at ${result.commandAlias || result.command}`);
-      if (!result.commandOnPath) {
-        Terminal.printInfo(`"vierrataleai" won't resolve in a new shell: add ${dirname(result.command)} to PATH, e.g. export PATH="$HOME/.local/bin:$PATH", then reopen the terminal.`);
-      }
-    }
+    await fakeProgress(INSTALL_STEPS, Engine.ensure());
     console.log();
   } else if (!quick) {
     // Auto-detect: install anything that's missing (engine, model) before starting.
-    await fakeProgress(READY_STEPS, Installer.ensure());
+    await fakeProgress(READY_STEPS, Engine.ensure());
     console.log();
   }
 

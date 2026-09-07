@@ -29,10 +29,10 @@ it automatically before opening the chat.
 ### Installer options
 
 ```bash
-./install.sh                # interactive
+./install.sh                # interactive (asks "NodeJS or Python? [N/P]")
 ./install.sh --node         # use the Node.js version
 ./install.sh --python       # use the Python version
-./install.sh --model NAME   # pick the local model (default: vierratale-fast)
+./install.sh --model NAME   # pick the local model (default: vierratale-lite)
 ./install.sh --no-engine    # skip engine / model installation
 ./install.sh --silent       # all defaults, no prompts
 ./install.sh --uninstall    # remove the commands + config

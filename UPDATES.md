@@ -7,42 +7,44 @@ The project is shipped as two mirrored packages — the **Node CLI**
 and every feature below is implemented identically in both mirrors. The Node
 and Python version numbers are listed together for each release.
 
-## Unreleased (next: `0.1.0-beta.13` / `0.1.0b12`)
+## `0.1.0-beta.14` (npm) / `0.1.0b14` (PyPI)
 
-### Installer fixes
-- `--install` now puts the `vierrataleai` command somewhere it can actually be
-  run: it is placed in the first writable bin dir that is already on `PATH`
-  (`~/.local/bin` only when that dir is on `PATH`, else `/usr/local/bin` or
-  `/usr/bin`), instead of always `~/.local/bin`.
-- Re-running the installer replaces stale/foreign launchers (e.g. a leftover
-  shim from the other runtime or a dangling symlink), so the command always
-  matches the version you just installed.
-- If no writable `PATH` dir was found, the CLI prints the exact `PATH`-export
-  line to add, instead of silently "succeeding".
-- Starting the assistant (plain `vierrataleai` / `node bin/vierrataleai.js`)
-  now auto-detects dependencies: if the AI engine (ollama) or the model is
-  missing it is installed first, with the animated "Checking engine … Ready"
-  step — installs happen on demand without needing `--install` (`--version`
-  and `--help` skip the check). This matches the Python CLI's existing
-  start-time `ensure()`.
-- The launcher is created under **both** names: `vierrataleai` and `vierratale`
-  (`Installer.install()` returns `command` + `commandAlias`; npm now ships both
-  bins in `package.json`, and PyPI declares both console scripts). Running
-  `vierratale` starts the assistant the same way.
-- `install.sh` was rewritten: it no longer re-installs the app from npm or
-  PyPI — this repo *is* the app. It now only installs requirements (curl, the
-  runtime, the engine, the model), links the `vierrataleai`/`vierratale`
-  commands into a writable on-PATH bin dir, and uses the same banner as the
-  CLI (the previous installer had the old ASCII art). It also picks the Python
-  that can actually run the app (has `rich`), avoids overwriting source
-  through symlinks when relinking commands, and `package.json` was added back
-  to the Node source so `npm install`/`npm pack` work again.
-- `install.sh`: the model pull invoked the non-existent `engine` command; it
-  now uses `ollama pull`, the tier→model table matches the app catalog
-  (`vierratale-fast` is `gemma3:1b`, `vierratale-lite` is `qwen3:0.6b`, …), a
-  failed pull reports a warning instead of a misleading success, pip is
-  bootstrapped correctly on Termux (no `python3-pip` package exists there),
-  and a missing `curl` is flagged up front.
+### Installer
+- The installer is now **`install.sh` at the project root** (this GitHub repo),
+  a single source of truth for both runtimes. Interactive runs ask
+  `NodeJS or Python? [N/P]` (flags: `--node`, `--python`, `--no-engine`,
+  `--model NAME`, `--silent`, `--uninstall`, `--help`).
+- It installs only requirements — the runtime, curl, the local AI engine
+  (Cortex, "secretly" Ollama), and the model — then links the
+  `vierrataleai`/`vierratale` commands into the first writable on-PATH bin
+  dir. It does **not** re-install the app from npm or PyPI; this repo is the
+  app.
+- The in-app programmatic launcher installers (`installer.js` / `installer.py`)
+  were removed. They are replaced by a slim runtime helper — `engine.js` /
+  `engine.py` — that the CLI still uses to auto-install the engine/model on
+  first run, resolve/substitute models, pull on demand, and power `/models`.
+- `--install` / `--setup` still ensure the engine + model (with the animated
+  progress), and now point the user to `install.sh` to create the global
+  commands.
+- The npm (`@vierratale/ai`) and PyPI (`vierrataleai`) packages keep both
+  `vierrataleai` and `vierratale` bins but no longer ship an `install.sh` —
+  that lives only in the project repo.
+- `install.sh` started the engine with the current banner, `ollama pull` tier→
+  model mapping matching the app catalog (`vierratale-fast` → `gemma3:1b`,
+  `vierratale-lite` → `qwen3:0.6b`, …), Termux-safe pip bootstrap (no
+  `python3-pip` package), picks the Python that has `rich`, and flags a missing
+  `curl` up front.
+
+### Launcher / command
+- Both `vierrataleai` and `vierratale` commands are created/refreshed by the
+  installer, pointing at this repo's launcher (Node symlink or a Python shim
+  with `PYTHONPATH` set), placed in the first writable dir already on `PATH`
+  (`/usr/local/bin` or `/usr/bin`, falling back to `~/.local/bin`) with a
+  PATH-export hint when needed.
+- Running the assistant (plain `vierrataleai` / `vierratale`) auto-detects
+  dependencies: if the engine or model is missing it is installed first, with
+  the "Checking engine … Ready" step (`--version`/`--help` skip the check).
+  This matches across both mirrors.
 
 ### File tree after creating folders/files
 - When the agent creates a folder or file, the resulting workspace structure is

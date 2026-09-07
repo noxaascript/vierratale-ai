@@ -10,7 +10,7 @@ from typing import Optional
 
 from . import config
 from . import catalog
-from . import installer
+from . import engine as installer
 from .providers import auto_detect, create, get_available
 from .ui.terminal import Terminal
 from .ui.banner import load_system_prompt
@@ -1362,24 +1362,13 @@ def main():
     asyncio.set_event_loop(loop)
 
     if args.install:
-        result = loop.run_until_complete(
-            fake_install(lambda: loop.run_in_executor(None, installer.install))
+        loop.run_until_complete(
+            fake_install(lambda: loop.run_in_executor(None, installer.ensure))
         )
-        if result and result.get("command"):
-            ui.print_success(
-                'Engine + model installed; "vierrataleai" (or "vierratale") command available at %s'
-                % (result.get("commandAlias") or result["command"])
-            )
-            if not result.get("commandOnPath"):
-                ui.print_info(
-                    '"vierrataleai" won\'t resolve in a new shell: add %s to PATH, e.g. '
-                    'export PATH="$HOME/.local/bin:$PATH", then reopen the terminal.'
-                    % os.path.dirname(result["command"])
-                )
-        else:
-            ui.print_info(
-                'Could not create a global command; run it via "python3 -m vierrataleai".'
-            )
+        ui.print_info(
+            'Use install.sh to create the global "vierrataleai" / "vierratale" commands; '
+            'then run them directly.'
+        )
 
     loop.run_until_complete(
         ui.show_progress(

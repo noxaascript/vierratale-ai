@@ -1,6 +1,6 @@
 export const Branding = {
   APP_NAME: 'VierrataleAI',
-  VERSION: '0.1.0-beta.12',
+  VERSION: '0.1.0-beta.14',
 
   colors: {
     primary: '\x1b[38;2;124;58;237m',

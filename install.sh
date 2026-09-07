@@ -12,9 +12,9 @@
 # only installs dependencies and links commands that launch the assistant.
 #
 # Usage:
-#   ./install.sh                Interactive
+#   ./install.sh                Interactive (asks "NodeJS or Python? [N/P]")
 #   ./install.sh --node         Use the Node.js version
-#   ./install.sh --python       Use the Python version (default)
+#   ./install.sh --python       Use the Python version
 #   ./install.sh --no-engine    Skip Engine / model installation
 #   ./install.sh --model NAME   Model to pull (default: vierratale-fast)
 #   ./install.sh --silent       Everything with defaults, no prompts
@@ -395,14 +395,14 @@ main() {
     if [ "$SILENT" = "1" ]; then
       cmd_exists python3 && MODE="python" || MODE="node"
     else
-      printf "${BOLD}Choose a version to install:${RESET}\n"
-      printf "  ${PURPLE}1)${RESET} Node.js\n"
-      printf "  ${PURPLE}2)${RESET} Python   ${GREEN}(recommended)${RESET}\n"
-      read -r -p "$(printf "${DIM}Choice [2]${RESET} ")" choice
-      case "${choice:-2}" in
-        1) MODE="node" ;;
-        *) MODE="python" ;;
-      esac
+      while true; do
+        read -r -p "$(printf "${DIM}NodeJS or Python? [N/P] ${RESET}")" choice
+        case "${choice:-P}" in
+          [Nn]*) MODE="node" ; break ;;
+          [Pp]*) MODE="python" ; break ;;
+          *) printf "  ${DIM}Please answer N or P.${RESET}\n" ;;
+        esac
+      done
     fi
   fi
 

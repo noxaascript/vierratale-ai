@@ -2,7 +2,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { Config } from './config.js';
 import { Catalog } from './catalog.js';
-import { Installer } from './installer.js';
+import { Engine } from './engine.js';
 import { ProviderFactory } from './providers/index.js';
 import { Branding } from './ui/branding.js';
 import { Terminal } from './ui/terminal.js';
@@ -811,7 +811,7 @@ async function chat(provider, systemPrompt) {
         : Catalog.getCloudModels();
       const installedSet = new Set();
       if (provider.isLocal) {
-        for (const m of await Installer.getInstalledModels(Config.get('engineHost'))) {
+        for (const m of await Engine.getInstalledModels(Config.get('engineHost'))) {
           installedSet.add(m);
         }
       }
@@ -1114,18 +1114,18 @@ async function ensureLocalModel(modelName, notify) {
 // dead-ends while at least one local model exists.
 async function ensureRawLocalModel(realModel, notify) {
   const host = Config.get('engineHost');
-  const resolved = await Installer.resolveModel(host, realModel);
+  const resolved = await Engine.resolveModel(host, realModel);
   if (resolved.model) {
     return { ok: true, model: resolved.model, reason: resolved.reason };
   }
   if (notify) notify(`Downloading ${realModel}… (this can take a while)`);
-  const pulled = await Installer.pullModel(host, realModel);
+  const pulled = await Engine.pullModel(host, realModel);
   if (pulled) {
     if (notify) notify(`Model ${realModel} ready.`);
     return { ok: true, model: realModel, reason: null };
   }
   if (notify) notify(`Could not download ${realModel}.`);
-  const first = await Installer.firstInstalled(host);
+  const first = await Engine.firstInstalled(host);
   if (first) {
     return { ok: true, model: first, reason: `Could not download ${realModel}; using installed ${first}` };
   }
@@ -1264,7 +1264,7 @@ export async function run() {
 
   await Terminal.showProgress(
     ['Checking engine', 'Installing dependencies', 'Downloading model', 'Optimizing'],
-    () => Installer.ensure()
+    () => Engine.ensure()
   );
 
   await ensureLocalModel(Config.get('model'));
