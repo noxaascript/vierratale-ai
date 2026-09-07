@@ -420,9 +420,9 @@ main() {
 
   # --- Ask about Cortex Engine (interactive only) ---
   if [ "$INSTALL_ENGINE" = "1" ] && [ "$SILENT" != "1" ]; then
-    printf "\n${BOLD}Install Cortex Engine and a local AI model (Cortex engine)?${RESET}\n"
+    printf "\n${BOLD}Install Cortex Engine and a local AI model?${RESET}\n"
     info "Downloads ~1GB and needs a few GB of memory for offline AI."
-    if ! prompt_yes_no "Install Cortex Engine + model??" "n"; then
+    if ! prompt_yes_no "Install Cortex Engine + model?" "y"; then
       INSTALL_ENGINE=0
     fi
   fi
@@ -430,6 +430,22 @@ main() {
   # --- Runtime prerequisites ---
   printf "\n${BOLD}Installing prerequisites...${RESET}\n"
   install_runtime
+
+  # --- Remove the unchosen runtime directory ---
+  case "$MODE" in
+    node)
+      if [ -d "$ROOT/python" ]; then
+        rm -rf "$ROOT/python"
+        info "Python source removed (NodeJS chosen)."
+      fi
+      ;;
+    python)
+      if [ -d "$ROOT/nodejs" ]; then
+        rm -rf "$ROOT/nodejs"
+        info "NodeJS source removed (Python chosen)."
+      fi
+      ;;
+  esac
 
   # --- Cortex Engine ---
   if [ "$INSTALL_ENGINE" = "1" ]; then
