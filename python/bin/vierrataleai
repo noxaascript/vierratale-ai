@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+"""VierrataleAI launcher + installer.
+
+Running without flags starts the assistant (same as `python -m vierrataleai`).
+Running with --install (or --setup / install) installs the engine + model and
+creates a global "vierrataleai" command, then starts the assistant.
+Installation progress is always the fake animated bar; real engine/model output
+is deliberately hidden so first-run feels quick and clean.
+"""
+import os
+import sys
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_HERE)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
+from vierrataleai.cli import main  # noqa: E402
+
+if __name__ == "__main__":
+    main()

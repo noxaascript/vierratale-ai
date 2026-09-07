@@ -1,0 +1,6 @@
+*.test.js
+.git
+node_modules
+python/
+*.log
+.DS_Store
