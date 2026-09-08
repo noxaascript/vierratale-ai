@@ -50,7 +50,7 @@ export class OpenAIProvider extends BaseProvider {
   _resolveModel(options) {
     const requested = options.model || Config.get('model');
     if (Catalog.isLocalModel(requested) || !Catalog.isCloudModel(requested)) {
-      return Catalog.getRealModel(Catalog.getDefaultCloudModel());
+      return 'gpt-4o-mini';
     }
     return Catalog.getRealModel(requested);
   }

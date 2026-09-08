@@ -4,7 +4,7 @@ import urllib.error
 from typing import AsyncGenerator, List, Optional
 
 from .base import BaseProvider
-from ..catalog import get_real_model, get_display_name, get_default_cloud_model, is_local_model, is_cloud_model
+from ..catalog import get_real_model, get_display_name, is_local_model, is_cloud_model
 from .. import config
 
 
@@ -50,7 +50,7 @@ class OpenAIProvider(BaseProvider):
 
     def _resolve_model(self, model_name: str) -> str:
         if is_local_model(model_name) or not is_cloud_model(model_name):
-            return get_real_model(get_default_cloud_model())
+            return "gpt-4o-mini"
         return get_real_model(model_name)
 
     async def stream(

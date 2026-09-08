@@ -16,7 +16,7 @@ export class GeminiProvider extends BaseProvider {
   _resolveModel(options) {
     const requested = options.model || Config.get('model');
     if (Catalog.isLocalModel(requested) || !Catalog.isCloudModel(requested)) {
-      return Catalog.getRealModel(Catalog.getDefaultCloudModel());
+      return 'gemini-2.0-flash';
     }
     const real = Catalog.getRealModel(requested);
     return real.startsWith('gemini-') ? real : 'gemini-2.0-flash';

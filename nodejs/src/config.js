@@ -19,8 +19,8 @@ const DEFAULTS = {
   maxTokens: 4096,
   keepAlive: '5m',
   numThreads: 8,
-  commandTimeoutMs: 60000,
-  planTimeoutMs: 45000,
+  commandTimeoutMs: 300000,
+  planTimeoutMs: 300000,
   downloadDir: join(homedir(), 'Downloads'),
 };
 

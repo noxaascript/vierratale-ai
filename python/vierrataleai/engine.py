@@ -168,7 +168,7 @@ def ensure() -> bool:
     real_model = catalog.get_real_model(config.get("model"))
     installed = _get_installed_models(host)
     if real_model not in installed:
-        if _resolve_from_list(installed, real_model) is None:
+        if _resolve_from_list(installed, real_model)["model"] is None:
             _pull_model(host, real_model)
 
     return True

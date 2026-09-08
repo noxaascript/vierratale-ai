@@ -850,7 +850,7 @@ async function chat(provider, systemPrompt) {
           chatUI.setModel(model, provider.displayName);
         };
         if (provider.isLocal && Catalog.isCloudModel(canonical)) {
-          chatUI.notify(`Cannot use cloud model "${canonical}" on ${provider.displayName} (local). Use /model VTL-3.7-Ultra or /provider openai.`);
+          chatUI.notify(`Cannot use cloud model "${canonical}" on ${provider.displayName} (local). Use /model VTL-2.7-Flash instead.`);
         } else if (!info) {
           if (provider.isLocal) {
             const switched = await ensureRawLocalModel(modelName, (m) => chatUI.notify(m));
@@ -1267,8 +1267,6 @@ export async function run() {
     () => Engine.ensure()
   );
 
-  await ensureLocalModel(Config.get('model'));
-
   const provider = await ProviderFactory.autoDetect();
   if (!provider) {
     logger.init();
@@ -1292,6 +1290,8 @@ export async function run() {
   logger.log('APP', `started provider=${provider.name} model=${Config.getEffectiveModel(provider.name)}`);
 
   Config.save({ provider: provider.name });
+
+  if (provider.isLocal) await ensureLocalModel(Config.get('model'));
 
   if (provider.warmup) provider.warmup();
 

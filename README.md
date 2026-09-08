@@ -54,10 +54,6 @@ pip install vierrataleai
 ```bash
 vierrataleai                          # Start chat (auto-detect provider)
 vierrataleai --provider cortex        # Use local models
-vierrataleai --provider openai        # Use cloud models (OpenAI)
-vierrataleai --provider anthropic     # Use cloud models (Claude)
-vierrataleai --provider gemini        # Use cloud models (Gemini)
-vierrataleai --model VTL-3.7-Ultra    # Use a specific model
 ```
 
 `vierratale` and `vierrataleai` are the same command.
@@ -68,32 +64,11 @@ Local models run through the **Cortex** engine:
 
 | Model | Tier |
 |-------|------|
-| VTL-2.5-Mini | minimal |
 | VTL-2.7-Flash | fast |
 | VTL-2.9-Core | small |
-| VTL-3.2-Orbit | small |
 | VTL-3.1-Plus | balanced |
 | VTL-3.3-Pro | coder |
 | VTL-3.5-Reason | reasoning |
-| VTL-3.7-Ultra | ultra |
-| VTL-4.7-Gusto | balanced |
-| VTL-5.4-Tempo | balanced |
-| VTL-5.2-Pinnacle | pro |
-| VTL-5.9-Sovereign | pro |
-
-Cloud models are available when the matching provider + API key is configured:
-
-| Model | Tier |
-|-------|------|
-| VTL-4.0 | cloud-mini |
-| VTL-4.2-Omni | cloud |
-| VTL-4.5-Plus | cloud-fast |
-| VTL-5.0-Pro | cloud-pro |
-| VTL-6.0-Reason | cloud-lite |
-| VTL-7.0-Omnij | cloud-plus |
-| VTL-8.0-Fabric | cloud-fabric |
-| VTL-9.0-Forge | cloud-forge |
-| VTL-10.0-Singularity | cloud-singularity |
 
 Legacy `vierratale-*` and old `VRTL-*` names (e.g. `vierratale-fast`) still
 work and map to the VTL names.

@@ -16,6 +16,7 @@
 #   ./install.sh --node         Use the Node.js version
 #   ./install.sh --python       Use the Python version
 #   ./install.sh --no-engine    Skip Engine / model installation
+#   ./install.sh --coding       Also pull the coding model (VTL-3.3-Pro)
 #   ./install.sh --model NAME   Model to pull (default: VTL-2.7-Flash)
 #   ./install.sh --silent       Everything with defaults, no prompts
 #   ./install.sh --uninstall    Remove the commands + config
@@ -38,6 +39,7 @@ RESET='\033[0m'
 VERSION="1.0.0"
 INSTALLER_NAME="VierrataleAI Installer"
 DEFAULT_MODEL="VTL-2.7-Flash"
+CODING_MODEL="VTL-3.3-Pro"
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 CONFIG_DIR="$XDG_CONFIG_HOME/vierrataleai"
 CONFIG_FILE="$CONFIG_DIR/config.json"
@@ -46,6 +48,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 MODE=""            # node | python
 INSTALL_ENGINE=1   # 1 = yes, 0 = no
+INSTALL_CODING=0   # 1 = yes, 0 = no (coding model)
 SILENT=0
 UNINSTALL=0
 
@@ -321,24 +324,15 @@ pull_model() {
   local model="$1" real
   # Real model names must match the app catalog (catalog.js / vierrataleai/catalog.py).
   case "$model" in
-    VTL-2.5-Mini)      real="qwen3:0.6b" ;;
     VTL-2.7-Flash)     real="gemma3:1b" ;;
     VTL-2.9-Core)      real="llama3.2:1b" ;;
-    VTL-3.2-Orbit)     real="llama3.2:3b" ;;
     VTL-3.1-Plus)      real="qwen2.5:1.5b" ;;
     VTL-3.3-Pro)       real="qwen2.5-coder:1.5b" ;;
     VTL-3.5-Reason)    real="qwen3:1.7b" ;;
-    VTL-3.7-Ultra)     real="qwen2.5:3b" ;;
-    VTL-4.7-Gusto)     real="gemma3:4b" ;;
-    VTL-5.4-Tempo)     real="phi4-mini" ;;
-    VTL-5.2-Pinnacle)  real="glm4:9b" ;;
-    VTL-5.9-Sovereign) real="qwen3:4b" ;;
-    vierratale-lite)     real="qwen3:0.6b" ;;
     vierratale-fast)     real="gemma3:1b" ;;
     vierratale-small)    real="llama3.2:1b" ;;
     vierratale-balanced) real="qwen2.5:1.5b" ;;
     vierratale-plus)     real="qwen3:1.7b" ;;
-    vierratale-pro)      real="qwen2.5:3b" ;;
     *)                   real="$model" ;;
   esac
   is_engine_installed || { warn "Engine binary not found; re-run this installer after installing it."; return 1; }
@@ -427,6 +421,15 @@ main() {
     fi
   fi
 
+  # --- Ask about coding model (interactive only) ---
+  if [ "$SILENT" != "1" ]; then
+    printf "\n${BOLD}Do you want coding support?${RESET}\n"
+    info "Installs a code-specialized model (${CODING_MODEL}) alongside the default."
+    if prompt_yes_no "Install coding model?" "y"; then
+      INSTALL_CODING=1
+    fi
+  fi
+
   # --- Runtime prerequisites ---
   printf "\n${BOLD}Installing prerequisites...${RESET}\n"
   install_runtime
@@ -453,6 +456,9 @@ main() {
     install_engine
     if is_engine_installed; then
       pull_model "$DEFAULT_MODEL"
+      if [ "$INSTALL_CODING" = "1" ]; then
+        pull_model "$CODING_MODEL"
+      fi
       write_config cortex "$DEFAULT_MODEL"
     else
       write_config auto "$DEFAULT_MODEL"
@@ -478,6 +484,9 @@ main() {
   info "Config: ${DIM}$CONFIG_FILE${RESET}"
   if [ "$INSTALL_ENGINE" = "1" ] && is_engine_installed; then
     info "Local engine (Cortex) + model ${CYAN}$DEFAULT_MODEL${RESET} ready."
+    if [ "$INSTALL_CODING" = "1" ]; then
+      info "Coding model ${CYAN}$CODING_MODEL${RESET} ready."
+    fi
   else
     info "Tip: re-run with ${CYAN}--engine${RESET} style flags to customize."
   fi
@@ -493,6 +502,7 @@ while [ $# -gt 0 ]; do
     --node)      MODE="node" ;;
     --python)    MODE="python" ;;
     --no-engine) INSTALL_ENGINE=0 ;;
+    --coding)    INSTALL_CODING=1 ;;
     --model)     shift; DEFAULT_MODEL="$1" ;;
     --silent)    SILENT=1 ;;
     --uninstall) UNINSTALL=1 ;;

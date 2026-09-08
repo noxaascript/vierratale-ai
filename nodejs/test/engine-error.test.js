@@ -19,13 +19,13 @@ test('cortex provider: 404 model-not-found gives actionable guidance', async () 
   const port = server.address().port;
 
   process.env.VIERRATALE_ENGINE_HOST = `http://127.0.0.1:${port}`;
-  process.env.VIERRATALE_MODEL = 'VRTL-7.cloud-mini';
+  process.env.VIERRATALE_MODEL = 'VTL-2.7-Flash';
   const { CortexProvider } = await import('../src/providers/cortex.js');
   const Config = (await import('../src/config.js')).Config;
 
   const provider = new CortexProvider();
   const real = Catalog.getRealModel(Config.get('model'));
-  assert.equal(real, 'gpt-4o-mini');
+  assert.equal(real, 'gemma3:1b');
 
   let error = null;
   try {
@@ -39,11 +39,11 @@ test('cortex provider: 404 model-not-found gives actionable guidance', async () 
 
   assert.ok(received, 'engine should have received the request');
   assert.equal(received.url, '/api/chat');
-  assert.equal(received.body.model, 'gpt-4o-mini');
+  assert.equal(received.body.model, 'gemma3:1b');
   assert.ok(error, 'expected an error to be thrown');
   assert.match(error.message, /^\[ERR-0002\]/);
   assert.match(error.message, /not installed/);
-  assert.match(error.message, /VTL-3\.7-Ultra/);
+  assert.match(error.message, /VTL-2\.7-Flash/);
   assert.ok(!error.message.includes('127.0.0.1'), 'error must not leak the engine URL');
   assert.ok(!error.message.includes(String(port)), 'error must not leak the engine port');
 

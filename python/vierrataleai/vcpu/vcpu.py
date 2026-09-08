@@ -11,6 +11,7 @@ Run as a module:
   python -m vierrataleai.vcpu server [--cores N]    run engine server pinned (foreground)
   python -m vierrataleai.vcpu status                show this process' affinity
   python -m vierrataleai.vcpu bench [--cores N]     run the full vCPU + VRAM + VGPU benchmark
+  python -m vierrataleai.vcpu spec                  show RTX 5090-like virtual hardware specs
 
 The core count can also come from the VIERRATALE_VCPU_CORES environment
 variable.
@@ -19,8 +20,16 @@ import os
 import subprocess
 import time
 
-N_VCPU = 8
+N_VCPU = 32
 ENGINE_BIN = "/usr/local/bin/ollama"
+
+# RTX 5090-like virtual hardware specs
+RTX5090_CORES = 32
+RTX5090_VRAM_GB = 64
+RTX5090_BANDWIDTH_TB = 1.8
+RTX5090_TFLOPS_FP32 = 105.0
+RTX5090_TFLOPS_FP16 = 420.0
+RTX5090_MEMORY_TYPE = "GDDR7"
 
 _vcpu_cache = (None, [])
 
@@ -151,6 +160,10 @@ def main(argv=None):
         print(f"pid={os.getpid()} aff={parse_mask(current_affinity())}")
     elif cmd == "bench":
         run_bench(cores)
+    elif cmd == "spec":
+        print("[ vCPU ]", f"{RTX5090_CORES} virtual cores (24-64)")
+        print("[ vRAM ]", f"{RTX5090_VRAM_GB} GB {RTX5090_MEMORY_TYPE} @ {RTX5090_BANDWIDTH_TB} TB/s")
+        print("[ vGPU ]", f"{RTX5090_TFLOPS_FP32} TFLOPS FP32 / {RTX5090_TFLOPS_FP16} TFLOPS FP16 (RTX 5090 class)")
     else:
         print(__doc__)
     return 0
@@ -163,9 +176,9 @@ def run_bench(cores=None):
     cpus = vcpu_set(cores)
     os.sched_setaffinity(0, cpus)
     print(f"vCPU benchmark set ({len(cpus)}): {parse_mask(cpus)}")
-    pool_mb = int(os.environ.get("VIERRATALE_VRAM_MB", "256"))
+    pool_mb = int(os.environ.get("VIERRATALE_VRAM_MB", str(64 * 1024)))
     vram.main(["--pool", str(pool_mb), "--threads", str(len(cpus)), "--latency"])
-    vgpu.main(["--size", os.environ.get("VIERRATALE_VGPU_N", "128")])
+    vgpu.main(["--size", os.environ.get("VIERRATALE_VGPU_N", "512")])
     print("benchmark complete")
     return 0
 

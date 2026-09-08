@@ -285,14 +285,14 @@ export class CortexProvider extends BaseProvider {
 // engine host is deliberately kept out of the message; errors carry codes.
 async function describeEngineError(resp, model) {
   if (/not found|does not exist|model.*missing/i.test(String(resp.statusText))) {
-    return `[ERR-0002] Model "${model}" is not installed on the engine. If you picked a cloud model, use /model VTL-3.7-Ultra or /provider openai.`;
+    return `[ERR-0002] Model "${model}" is not installed on the engine. If you picked a cloud model, use /model VTL-2.7-Flash instead.`;
   }
   let body = '';
   try {
     body = (await resp.text()).slice(0, 300);
   } catch {}
   if (/not found|does not exist|model.*missing/i.test(body)) {
-    return `[ERR-0002] Model "${model}" is not installed on the engine. If you picked a cloud model, use /model VTL-3.7-Ultra or /provider openai.`;
+    return `[ERR-0002] Model "${model}" is not installed on the engine. If you picked a cloud model, use /model VTL-2.7-Flash instead.`;
   }
   return `[ERR-0003] The engine returned HTTP ${resp.status}. Check the engine status or run /model VTL-2.7-Flash.`;
 }

@@ -24,16 +24,16 @@ class ConfigModelMemoryTest(unittest.TestCase):
 
     def test_legacy_names_are_canonicalized(self):
         config.load()
-        config.set_provider_model("cortex", "vierratale-pro")
-        self.assertEqual(config.get_effective_model("cortex"), "VTL-3.7-Ultra")
+        config.set_provider_model("cortex", "vierratale-plus")
+        self.assertEqual(config.get_effective_model("cortex"), "VTL-3.5-Reason")
         config._config["model"] = "vierratale-fast"
         self.assertEqual(config.get_effective_model("openai"), "VTL-2.7-Flash")
 
     def test_provider_model_persists(self):
         config.load()
-        config.set_provider_model("cortex", "VRTL-6.pro")
+        config.set_provider_model("cortex", "VRTL-5.plus")
         config._config = None  # simulate reload from disk
-        self.assertEqual(config.get_effective_model("cortex"), "VTL-3.7-Ultra")
+        self.assertEqual(config.get_effective_model("cortex"), "VTL-3.5-Reason")
         # different provider unaffected
         self.assertEqual(config.get_effective_model("openai"), "VTL-2.7-Flash")
 

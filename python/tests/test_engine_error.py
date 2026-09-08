@@ -38,14 +38,14 @@ class EngineErrorTest(unittest.TestCase):
 
     def test_cortex_404_model_not_found_gives_guidance(self):
         os.environ["VIERRATALE_ENGINE_HOST"] = f"http://127.0.0.1:{self.port}"
-        os.environ["VIERRATALE_MODEL"] = "VRTL-7.cloud-mini"
+        os.environ["VIERRATALE_MODEL"] = "VTL-2.7-Flash"
 
         from vierrataleai.providers.cortex import CortexProvider
         from vierrataleai import config
         from vierrataleai.catalog import get_real_model
         config.load()
 
-        self.assertEqual(get_real_model("VRTL-7.cloud-mini"), "gpt-4o-mini")
+        self.assertEqual(get_real_model("VTL-2.7-Flash"), "gemma3:1b")
 
         provider = CortexProvider()
 
@@ -61,13 +61,13 @@ class EngineErrorTest(unittest.TestCase):
 
         path, body = self.server.received
         self.assertEqual(path, "/api/chat")
-        self.assertEqual(body["model"], "gpt-4o-mini")
+        self.assertEqual(body["model"], "gemma3:1b")
 
         msg = ctx.exception.args[0]
         self.assertTrue(msg.startswith("[ERR-0002]"), msg)
         self.assertIn("not installed", msg)
-        self.assertIn("gpt-4o-mini", msg)
-        self.assertIn("VTL-3.7-Ultra", msg)
+        self.assertIn("gemma3:1b", msg)
+        self.assertIn("VTL-2.7-Flash", msg)
         self.assertFalse(msg.startswith("http://"), "must not leak the engine URL")
         self.assertNotIn(str(self.port), msg)
 

@@ -16,7 +16,7 @@ export class AnthropicProvider extends BaseProvider {
   _resolveModel(options) {
     const requested = options.model || Config.get('model');
     if (Catalog.isLocalModel(requested) || !Catalog.isCloudModel(requested)) {
-      return Catalog.getRealModel(Catalog.getDefaultCloudModel());
+      return 'claude-3-5-haiku-20241022';
     }
     const real = Catalog.getRealModel(requested);
     return real.startsWith('claude-') ? real : 'claude-3-5-haiku-20241022';

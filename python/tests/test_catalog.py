@@ -12,23 +12,21 @@ class CatalogTest(unittest.TestCase):
 
     def test_legacy_vierratale_names_still_map(self):
         self.assertEqual(catalog.get_real_model("vierratale-fast"), "gemma3:1b")
-        self.assertEqual(catalog.get_real_model("vierratale-cloud-mini"), "gpt-4o-mini")
-        self.assertEqual(catalog.normalize("vierratale-pro"), "VTL-3.7-Ultra")
-        self.assertEqual(catalog.normalize("VRTL-6.pro"), "VTL-3.7-Ultra")
+        self.assertEqual(catalog.normalize("vierratale-plus"), "VTL-3.5-Reason")
+        self.assertEqual(catalog.normalize("VRTL-4.coder"), "VTL-3.3-Pro")
         self.assertEqual(catalog.normalize("nonsense"), "nonsense")
 
     def test_local_vs_cloud(self):
         self.assertTrue(catalog.is_local_model("VRTL-2.fast"))
         self.assertFalse(catalog.is_local_model("VRTL-8.cloud"))
         self.assertTrue(catalog.is_local_model("vierratale-fast"))
-        self.assertTrue(catalog.is_cloud_model("VRTL-7.cloud-mini"))
+        self.assertFalse(catalog.is_cloud_model("VRTL-7.cloud-mini"))
         self.assertFalse(catalog.is_cloud_model("VRTL-6.pro"))
-        self.assertTrue(catalog.is_cloud_model("vierratale-cloud"))
+        self.assertFalse(catalog.is_cloud_model("vierratale-cloud"))
 
     def test_default_cloud(self):
         default = catalog.get_default_cloud_model()
-        self.assertTrue(catalog.is_cloud_model(default))
-        self.assertTrue(catalog.get_real_model(default).startswith("gpt-"))
+        self.assertEqual(default, "")
 
     def test_model_info_present(self):
         for display in catalog.get_all_models().values():
@@ -57,14 +55,13 @@ class OpenAIProviderTest(unittest.IsolatedAsyncioTestCase):
         config._config["model"] = "VRTL-2.fast"
         provider = OpenAIProvider()
         real = provider._resolve_model("VRTL-2.fast")
-        self.assertEqual(real, catalog.get_real_model(catalog.get_default_cloud_model()))
-        self.assertTrue(real.startswith("gpt-"))
+        self.assertEqual(real, "gpt-4o-mini")
 
-    def test_cloud_model_verbatim(self):
+    def test_non_cloud_model_falls_back_to_default(self):
         from vierrataleai.providers.openai import OpenAIProvider
 
         provider = OpenAIProvider()
-        self.assertEqual(provider._resolve_model("VRTL-8.cloud"), "gpt-4o")
+        self.assertEqual(provider._resolve_model("VRTL-8.cloud"), "gpt-4o-mini")
 
 
 if __name__ == "__main__":

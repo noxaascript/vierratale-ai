@@ -8,6 +8,37 @@ and every feature below is implemented identically in both mirrors. Every
 published version is listed here, newest first; the Node and Python version
 numbers are listed together for each release.
 
+## `0.1.0-beta.16` (npm) / `0.1.0b16` (PyPI)
+
+### Catalog trimmed to the 5 installed models
+- The catalog is now limited to the models actually installed locally:
+  `VTL-2.7-Flash` (gemma3:1b), `VTL-2.9-Core` (llama3.2:1b),
+  `VTL-3.1-Plus` (qwen2.5:1.5b), `VTL-3.3-Pro` (qwen2.5-coder:1.5b) and
+  `VTL-3.5-Reason` (qwen3:1.7b). All 9 cloud entries and the uninstalled
+  local entries were removed; the legacy names for removed models no longer
+  resolve.
+- `install.sh --model` pull list updated to match; cloud gems (creator,
+  chat, release) still install in the background when configured.
+
+### Bug fixes
+- **Engine**: the default model is now actually downloaded on startup
+  when missing — the auto-pull was silently skipped because the "already
+  installed?" check always matched.
+- **Cloud providers** (OpenAI / Anthropic / Gemini) no longer send local
+  ollama tags (e.g. `gemma3:1b`) to the cloud APIs; a local or unknown model
+  now falls back to a real provider default (`gpt-4o-mini` /
+  `claude-3-5-haiku-20241022` / `gemini-2.0-flash`).
+- **CLI**: a local ollama model is no longer force-downloaded when a cloud
+  provider is active.
+- **Node timeouts**: command/plan timeouts aligned with the Python mirror
+  (300 s).
+
+### vCPU / VRAM defaults
+- `vcpu` gained a `spec` command printing RTX 5090-class virtual specs; the
+  default engine now exposes 32 virtual cores.
+- `vram` default pool raised to 64 GB virtual VRAM with 32 threads; vgpu
+  bench default size raised to 512 MB.
+
 ## `0.1.0-beta.15` (npm) / `0.1.0b15` (PyPI)
 
 ### Rebrand: VTL model catalog (no vendor names shown)

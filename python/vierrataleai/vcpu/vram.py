@@ -17,8 +17,8 @@ import time
 
 from .vcpu import vcpu_set
 
-DEFAULT_POOL_MB = 256
-DEFAULT_THREADS = 6
+DEFAULT_POOL_MB = 64 * 1024  # 64 GB virtual VRAM
+DEFAULT_THREADS = 32
 
 
 def allocate_pool(mb, zero=False):

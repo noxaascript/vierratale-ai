@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="vierrataleai",
-    version="0.1.0b15",
+    version="0.1.0b16",
     description="VierrataleAI - Intelligent terminal assistant",
     long_description=open("README.md").read() if __import__("os").path.exists("README.md") else "",
     long_description_content_type="text/markdown",

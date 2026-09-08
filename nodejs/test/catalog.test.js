@@ -11,9 +11,9 @@ test('catalog: real <-> display mapping', () => {
 
 test('catalog: legacy vierratale-* names still map', () => {
   assert.equal(Catalog.getRealModel('vierratale-fast'), 'gemma3:1b');
-  assert.equal(Catalog.getRealModel('vierratale-cloud-mini'), 'gpt-4o-mini');
-  assert.equal(Catalog.normalize('vierratale-pro'), 'VTL-3.7-Ultra');
-  assert.equal(Catalog.normalize('VRTL-6.pro'), 'VTL-3.7-Ultra');
+  assert.equal(Catalog.getRealModel('vierratale-plus'), 'qwen3:1.7b');
+  assert.equal(Catalog.normalize('VRTL-4.coder'), 'VTL-3.3-Pro');
+  assert.equal(Catalog.normalize('VRTL-5.plus'), 'VTL-3.5-Reason');
   assert.equal(Catalog.normalize('nonsense'), 'nonsense');
 });
 
@@ -21,23 +21,20 @@ test('catalog: local vs cloud', () => {
   assert.equal(Catalog.isLocalModel('VRTL-2.fast'), true);
   assert.equal(Catalog.isLocalModel('VRTL-8.cloud'), false);
   assert.equal(Catalog.isLocalModel('vierratale-fast'), true);
-  assert.equal(Catalog.isCloudModel('VRTL-7.cloud-mini'), true);
+  assert.equal(Catalog.isCloudModel('VRTL-7.cloud-mini'), false);
   assert.equal(Catalog.isCloudModel('VRTL-6.pro'), false);
-  assert.equal(Catalog.isCloudModel('vierratale-cloud'), true);
+  assert.equal(Catalog.isCloudModel('vierratale-cloud'), false);
 });
 
-test('catalog: default cloud model is a real cloud display name', () => {
+test('catalog: no cloud models are configured', () => {
   const def = Catalog.getDefaultCloudModel();
-  assert.equal(Catalog.isCloudModel(def), true);
-  assert.ok(Catalog.getRealModel(def).startsWith('gpt-'));
+  assert.equal(def, '');
+  assert.equal(Catalog.getCloudModels().length, 0);
 });
 
-test('catalog: cloud vendor routing', () => {
+test('catalog: cloud vendor routing falls back to openai when not a cloud model', () => {
   assert.equal(Catalog.getVendorForCloudModel('VRTL-7.cloud-mini'), 'openai');
-  assert.equal(Catalog.getVendorForCloudModel('VRTL-9.cloud-fast'), 'anthropic');
-  assert.equal(Catalog.getVendorForCloudModel('VRTL-10.cloud-pro'), 'anthropic');
-  assert.equal(Catalog.getVendorForCloudModel('VRTL-11.cloud-lite'), 'gemini');
-  assert.equal(Catalog.getVendorForCloudModel('VRTL-12.cloud-plus'), 'gemini');
+  assert.equal(Catalog.getVendorForCloudModel('VTL-2.7-Flash'), 'openai');
 });
 
 test('catalog: getModelInfo present for all listed models', () => {

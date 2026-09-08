@@ -394,16 +394,16 @@ test('agent: broken model (plan error) falls back to the heuristic instead of ha
   }
 });
 
-test('agent: config commandTimeoutMs default is 60000', () => {
+test('agent: config commandTimeoutMs default is 300000', () => {
   const tmpDir = mkdtempSync(join(tmpdir(), 'vierra-cfg-'));
   const prev = process.env.VIERRATALE_CONFIG_DIR;
   delete process.env.VIERRATALE_COMMAND_TIMEOUT_MS;
   process.env.VIERRATALE_CONFIG_DIR = tmpDir;
   try {
     // Fresh Config instance reads a (necessarily empty) config dir, so it must
-    // fall back to the built-in 60000 default rather than any user file.
+    // fall back to the built-in 300000 default rather than any user file.
     Config._config = null;
-    assert.equal(Config.get('commandTimeoutMs'), 60000);
+    assert.equal(Config.get('commandTimeoutMs'), 300000);
   } finally {
     if (prev === undefined) delete process.env.VIERRATALE_CONFIG_DIR;
     else process.env.VIERRATALE_CONFIG_DIR = prev;

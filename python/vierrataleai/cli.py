@@ -1060,7 +1060,7 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
                     if provider.is_local and catalog.is_cloud_model(canonical):
                         chat_ui.notify(
                             f"Cannot use cloud model \"{canonical}\" on {provider.display_name} (local). "
-                            f"Use /model VTL-3.7-Ultra or /provider openai."
+                            f"Use /model VTL-2.7-Flash instead."
                         )
                     elif not info:
                         if provider.is_local:
@@ -1399,7 +1399,8 @@ def main():
 
     config.save({"provider": provider.name})
 
-    loop.run_until_complete(_ensure_local_model(config.get("model")))
+    if provider.is_local:
+        loop.run_until_complete(_ensure_local_model(config.get("model")))
 
     has_warmup = getattr(provider, "warmup", None)
     if has_warmup:
