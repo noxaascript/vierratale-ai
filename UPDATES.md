@@ -8,6 +8,31 @@ and every feature below is implemented identically in both mirrors. Every
 published version is listed here, newest first; the Node and Python version
 numbers are listed together for each release.
 
+## `0.1.0-beta.17` (npm) / `0.1.0b17` (PyPI)
+
+### Automatic task-based model routing
+- Every turn is now matched against the current message and routed to the
+  best local model:
+  - **file/folder/code/diff/git/bug-fix work** → `VTL-3.3-Pro` (qwen2.5-coder)
+  - **research/knowledge questions** ("explain", "difference between",
+    "what is", "research", "compare"…) → `VTL-3.5-Reason` (qwen3)
+  - **everything else (daily chat)** → `VTL-2.7-Flash` (gemma)
+- Picking a model explicitly with `/model` pins it and disables automatic
+  routing (persists in config).
+- When a turn is auto-routed to a non-default model the CLI shows
+  `Auto-routed → <model>` so the routing decision is visible.
+
+### Code diff / share feature
+- When a turn is routed to the coding model, the local git working tree is
+  shared with the model as context: `git status` + the staged/unstaged
+  `git diff` and up to two new (untracked) files are attached to the
+  conversation, so the AI can act on the code that actually changed.
+- Outside a git repository (or with a clean tree) nothing is attached.
+
+### Notes
+- Implemented identically in both mirrors (`python` + `node`), with new
+  unit tests for the router and the diff share.
+
 ## `0.1.0-beta.16` (npm) / `0.1.0b16` (PyPI)
 
 ### Catalog trimmed to the 5 installed models

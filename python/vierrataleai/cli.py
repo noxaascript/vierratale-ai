@@ -25,6 +25,8 @@ from .utils.logger import logger
 from .cmd.agent import run_with_tools, tool_results_prompt, looks_like_operation_request
 from .cmd.todos import load_todos, add_todo, update_todo, clear_todos, save_todos, format_todos, todos_file
 from .utils.intents import detect_intent, extract_search_topic, looks_like_story_request
+from .utils.router import route_model as _route_model
+from .utils.diff import git_changes as _git_changes
 from .utils.platform import is_termux
 from . import session as session_mod
 
@@ -173,7 +175,7 @@ async def answer_with_search(messages, provider, query: str, system_prompt: str,
     async for chunk in provider.stream(
         messages,
         {
-            "model": config.get_effective_model(provider.name),
+            "model": _turn_model(messages, provider),
             "system_prompt": system_prompt,
             "max_tokens": 600,
         },
@@ -247,7 +249,7 @@ async def answer_with_fetch(messages, provider, url: str, system_prompt: str, co
     async for chunk in provider.stream(
         messages,
         {
-            "model": config.get_effective_model(provider.name),
+            "model": _turn_model(messages, provider),
             "system_prompt": system_prompt,
             "max_tokens": 600,
         },
@@ -301,7 +303,7 @@ async def answer_with_download(messages, provider, url: str, system_prompt: str,
     async for chunk in provider.stream(
         messages,
         {
-            "model": config.get_effective_model(provider.name),
+            "model": _turn_model(messages, provider),
             "system_prompt": system_prompt,
             "max_tokens": 300,
         },
@@ -409,7 +411,7 @@ async def answer_with_tools(messages, provider, request_text, system_prompt, con
     try:
         async for chunk in provider.stream(
             messages,
-            {"model": config.get_effective_model(provider.name), "system_prompt": system_prompt, "max_tokens": 220},
+            {"model": _turn_model(messages, provider), "system_prompt": system_prompt, "max_tokens": 220},
         ):
             response += chunk
             chat_ui.set_streaming(response)
@@ -538,6 +540,26 @@ def _requested_file_name(text: str) -> Optional[str]:
     if re.search(r"\bsql\b", lower):
         return "output.sql"
     return None
+
+
+def _last_user_text(messages: list) -> str:
+    """The most recent visible user message (hidden context is skipped)."""
+    for m in reversed(messages):
+        if m.get("role") == "user" and not m.get("hidden", False):
+            return m["content"]
+    return ""
+
+
+def _routing_active(provider) -> bool:
+    """Auto-routing is active unless the user pinned a model via /model."""
+    return config.get_provider_model(provider.name) is None
+
+
+def _turn_model(messages: list, provider) -> str:
+    """Model used for this turn: auto-routed, or the pinned/configured one."""
+    if not _routing_active(provider):
+        return config.get_effective_model(provider.name)
+    return _route_model(_last_user_text(messages)) or config.get_effective_model(provider.name)
 
 
 def _extract_fallback_file(response: str, request_text: str) -> dict:
@@ -1263,7 +1285,16 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
             messages.append({"role": "user", "content": user_input})
             if _looks_like_file_request(user_input):
                 messages.append({"role": "user", "content": _FILE_BLOCK_PROMPT, "hidden": True})
+            routed = _turn_model(messages, provider)
+            if routed == "VTL-3.3-Pro" and not looks_like_operation_request(user_input):
+                diff_block = _git_changes(os.getcwd())
+                if diff_block:
+                    messages.append({"role": "user", "content": diff_block, "hidden": True})
             session_mod.save(messages)
+
+            default_model = config.get_effective_model(provider.name)
+            if routed != default_model:
+                chat_ui.notify(f"Auto-routed → {catalog.get_display_name(routed)}")
 
             chat_ui.set_thinking(True)
             chat_ui.render(messages)
@@ -1273,7 +1304,7 @@ async def chat(provider, system_prompt: str, chat_ui: ChatUI):
             async for chunk in provider.stream(
                 messages,
                 {
-                    "model": config.get_effective_model(provider.name),
+                    "model": routed,
                     "system_prompt": system_prompt,
                 },
             ):

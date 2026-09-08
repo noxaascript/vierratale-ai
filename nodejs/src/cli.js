@@ -13,6 +13,8 @@ import { WebFetch } from './utils/webfetch.js';
 import { Downloader } from './utils/downloader.js';
 import { FileWriter } from './utils/filewriter.js';
 import { detectIntent, extractSearchTopic, looksLikeStoryRequest } from './utils/intents.js';
+import { routeModel } from './utils/router.js';
+import { gitChanges } from './utils/diff.js';
 import { trySolveMath } from './utils/math.js';
 import { Session } from './session.js';
 import { ChatUI, FrameThrottle } from './ui/chatbox.js';
@@ -153,6 +155,26 @@ function requestedFileName(text) {
   if (/\bcsv\b/.test(lower)) return 'output.csv';
   if (/\bsql\b/.test(lower)) return 'output.sql';
   return null;
+}
+
+// Most recent visible user message (hidden context is skipped).
+function lastUserText(messages) {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m.role === 'user' && !m.hidden) return m.content;
+  }
+  return '';
+}
+
+// Auto-routing is active unless the user pinned a model via /model.
+function routingActive(provider) {
+  return Config.getProviderModel(provider.name) === null;
+}
+
+// Model used for this turn: auto-routed, or the pinned/configured one.
+function turnModel(messages, provider) {
+  if (!routingActive(provider)) return Config.getEffectiveModel(provider.name);
+  return routeModel(lastUserText(messages)) || Config.getEffectiveModel(provider.name);
 }
 
 function extractFallbackFile(response, requestText) {
@@ -409,7 +431,7 @@ async function answerWithSearch(messages, provider, query, systemPrompt, confirm
   const frame = new FrameThrottle(() => chatUI.render(messages));
   try {
     for await (const chunk of provider.stream(messages, {
-      model: Config.getEffectiveModel(provider.name),
+      model: turnModel(messages, provider),
       systemPrompt,
       maxTokens: 600,
     })) {
@@ -484,7 +506,7 @@ async function answerWithFetch(messages, provider, url, systemPrompt, confirm, c
   const frame = new FrameThrottle(() => chatUI.render(messages));
   try {
     for await (const chunk of provider.stream(messages, {
-      model: Config.getEffectiveModel(provider.name),
+      model: turnModel(messages, provider),
       systemPrompt,
       maxTokens: 600,
     })) {
@@ -540,7 +562,7 @@ async function answerWithDownload(messages, provider, url, systemPrompt, confirm
   const frame = new FrameThrottle(() => chatUI.render(messages));
   try {
     for await (const chunk of provider.stream(messages, {
-      model: Config.getEffectiveModel(provider.name),
+      model: turnModel(messages, provider),
       systemPrompt,
       maxTokens: 300,
     })) {
@@ -1069,7 +1091,16 @@ async function chat(provider, systemPrompt) {
     if (looksLikeFileRequest(trimmed)) {
       messages.push({ role: 'user', content: FILE_BLOCK_PROMPT, hidden: true });
     }
+    const routed = turnModel(messages, provider);
+    if (routed === 'VTL-3.3-Pro' && !looksLikeOperationRequest(trimmed)) {
+      const diffBlock = await gitChanges(process.cwd());
+      if (diffBlock) messages.push({ role: 'user', content: diffBlock, hidden: true });
+    }
     Session.save(messages);
+
+    if (routed !== Config.getEffectiveModel(provider.name)) {
+      chatUI.notify(`Auto-routed → ${Catalog.getDisplayName(routed)}`);
+    }
 
     chatUI.setThinking(true);
     chatUI.render(messages);
@@ -1077,7 +1108,7 @@ async function chat(provider, systemPrompt) {
     const frame = new FrameThrottle(() => chatUI.render(messages));
     try {
       for await (const chunk of provider.stream(messages, {
-        model: Config.getEffectiveModel(provider.name),
+        model: routed,
         systemPrompt,
         maxTokens: 600,
       })) {
@@ -1220,7 +1251,7 @@ async function answerWithTools(messages, provider, requestText, systemPrompt, co
   const frame = new FrameThrottle(() => chatUI.render(messages));
   try {
     for await (const chunk of provider.stream(messages, {
-      model: Config.getEffectiveModel(provider.name),
+      model: turnModel(messages, provider),
       systemPrompt,
       maxTokens: 220,
     })) {
